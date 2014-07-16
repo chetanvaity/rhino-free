@@ -1,0 +1,39 @@
+-# divid = "Cal#{widget.id}"
+- ifrid = "Cal#{widget.id}"
+-#%div{:id => "#{divid}", :style => "height:250px"}
+
+
+-#Sharing a public calendar
+-# Source of iframe set using AJAX
+%iframe{:id =>"#{ifrid}", :height=> "400", :width => "700px"}
+
+%script{:type => "text/javascript", :src => "http://code.jquery.com/jquery-latest.js"}
+
+%script
+  :plain
+    //Assumption: Singleton data source
+    function drawWidget#{widget.id} (iframe#{widget.id}) {
+      return function(response) {
+        var srcdata = response.data.srcdata;
+
+        var val;
+        //srcdata has only one entry
+        for(var srcid in srcdata) {
+          val = srcdata[srcid];
+        }
+
+        iframe#{widget.id}.src = val;
+      } //end anon return function()
+    } //end drawWidget()
+    
+    // set global vars once DOM finishes
+    //TBD: Should this be under onLoad()?
+    $(document).ready(function() {
+      // Get iframe
+      var iframe#{widget.id} = document.getElementById("#{ifrid}");
+
+      // Get properties for iframe and populate
+      //TBD: catch error, timeout
+      $.getJSON("/widgets/#{widget.id}/getProperties.json", drawWidget#{widget.id}(iframe#{widget.id}));
+    });
+

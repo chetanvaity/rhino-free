@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @source.name
+%p
+  %b Source type:
+  = @source.source_type_id
+%p
+  %b Properties:
+  = @source.properties
+
+= link_to 'Edit', edit_source_path(@source)
+\|
+= link_to 'Back', sources_path

@@ -1,0 +1,26 @@
+= form_for @source do |f|
+  - if @source.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@source.errors.count, "error")} prohibited this source from being saved:"
+      %ul
+        - @source.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+  .field
+    = f.label :source_type_id
+    = f.number_field :source_type_id
+  -#Replace field id input to select list
+    Include Blank to accomodate source creation "before" source_type creation
+    NOT USED FOR NOW
+  -#.field
+    = f.label :source_type_id
+    #{select("source", "source_type_id", SourceType::all.collect {|t| [t.name, t.id]}, {:include_blank => true})}
+
+  .field
+    = f.label :properties
+    = f.text_field :properties
+  .actions
+    = f.submit 'Save'

@@ -1,0 +1,70 @@
+- divid = "Gauge#{widget.id}"
+%div{:id => "#{divid}", :style => "height:250px"}
+
+%script{:type => "text/javascript", :src => "https://www.google.com/jsapi"}
+
+%script
+  :plain
+    // load the visualization api & skin
+    //TBD: Will this load() conflict with other gauges? 
+    google.load('visualization', '1', {packages: ['gauge']});
+    
+    // draw the initial chart from snapshot data for quick rendering
+    //TBD: Will callback() work for multiple widgets of same type? Multiple callbacks!
+    google.setOnLoadCallback(trackGauge#{widget.id});
+    
+    // set global vars once DOM finishes
+    $(document).ready(function() {
+     //Widget data
+     //var data#{widget.id};
+
+     // Create the gauge visualization.
+     gauge#{widget.id} = new google.visualization.Gauge(document.getElementById("#{divid}"));
+    });
+
+
+    //Assumption: Singleton data source
+    function drawVisualization#{widget.id}(gauge#{widget.id}) {
+       return function(response) {
+         var srcdata = response.data.srcdata;
+         //var metadata = response.data.metadata; //Not used
+
+         // Create and populate the data table.
+         //data#{widget.id} = google.visualization.arrayToDataTable([ ['Label', 'Value']]);
+         data#{widget.id} = new google.visualization.DataTable();
+         data#{widget.id}.addColumn('string', 'Label');
+         data#{widget.id}.addColumn('number', 'Value');
+
+         var val; 
+         //srcdata has only one entry
+         for(var srcid in srcdata) { 
+           val = srcdata[srcid];
+           // TBD: Why so many conversions?
+           fieldVal#{widget.id} = parseInt(val["field1"]); 
+           //data#{widget.id}.
+           data#{widget.id}.addRow([srcid, fieldVal#{widget.id}]);
+         }
+         //Assumption: Source has value in field1, Thingspeak specific hardcode!
+         //fieldVal#{widget.id} = parseInt(val["field1"]); 
+ 
+         // Create and populate the data table.
+         //data#{widget.id} = google.visualization.arrayToDataTable([ ['Label', 'Value'], ['Temp', fieldVal#{widget.id}]]);
+
+         //TBD: size of gauge needs to be given. hardcoding now.
+         gauge#{widget.id}.draw(data#{widget.id},{height: 200, width: 300});
+         } //end anon return function()
+    } // end function drawVisualization
+
+     //get json data and use "closure" to call anon function to process data
+     //TBD: error(), timeout hardcoded
+     function getData#{widget.id}(gauge#{widget.id}) {
+       $.getJSON("/widgets/#{widget.id}/getData.json", {timeout: 10000}, drawVisualization#{widget.id}(gauge#{widget.id}));
+     } // end function(getData())
+
+    //Get gauge data every specified interval and draw gauge
+    //TBD: Interval hardcoded
+    function trackGauge#{widget.id}() {
+      getData#{widget.id}(gauge#{widget.id});
+      setInterval("getData#{widget.id}(gauge#{widget.id})", 60000);
+    }
+   

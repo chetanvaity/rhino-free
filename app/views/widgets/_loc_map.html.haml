@@ -1,0 +1,81 @@
+- divid = "loc_map#{widget.id}"
+
+%h3 Personnel tracking using geolocation
+
+%div{:id => "#{divid}", :style => "height:250px"}
+
+%script{:type => "text/javascript", :src => "http://www.openlayers.org/api/OpenLayers.js"}
+   
+%script
+  :plain
+    var fromProjection#{widget.id} = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+    var toProjection#{widget.id}   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+  
+    map#{widget.id} = new OpenLayers.Map("#{divid}");
+    var mapnik#{widget.id}         = new OpenLayers.Layer.OSM();
+    map#{widget.id}.addLayer(mapnik#{widget.id});
+
+    var markerlayer#{widget.id} = new OpenLayers.Layer.Markers("Markers_#{divid}" );
+    map#{widget.id}.addLayer(markerlayer#{widget.id});
+
+    var srcdata#{widget.id};
+
+    function getMarkers#{widget.id}() {
+      $.getJSON("/widgets/#{widget.id}/getData.json", function(response) {
+        srcdata#{widget.id} = response.data.srcdata;
+        var metadata = response.data.metadata;
+
+        markerlayer#{widget.id}.clearMarkers();
+        for (var srcid in srcdata#{widget.id}) {
+          var marker = srcdata#{widget.id}[srcid];
+          position = new OpenLayers.LonLat(marker["longitude"], marker["latitude"]).transform(fromProjection#{widget.id}, toProjection#{widget.id});
+          m = new OpenLayers.Marker(position);
+
+          //Note: Icons cannot be shared between markers. Need to clone()
+          // Following is fine, cause we instantiated inside a loop.
+          //TBD: Icon path to be passed from sources
+          var size = new OpenLayers.Size(12, 12);
+          var offset = new OpenLayers.Pixel(-(size.w / 2), -size.h);
+          var icon = marker["icon"];
+
+          if (icon) m.icon = new OpenLayers.Icon(icon, size, offset);
+
+          //Set title of marker
+          m.icon.imageDiv.title = 'Long: ' + marker["longitude"] + ', Lat: ' + marker["latitude"];
+
+          markerlayer#{widget.id}.addMarker(m);
+
+          // Set mousedown event
+          markerlayer#{widget.id}.events.register('mousedown', m, function(evt) { alert("Marker data: " + 'Long: ' + marker["longitude"] + ', Lat: ' + marker["latitude"]); });
+        }; // end for(srcid)
+
+      centerposition = new OpenLayers.LonLat(metadata.centerposition["longitude"], metadata.centerposition["latitude"]).transform(fromProjection#{widget.id}, toProjection#{widget.id});
+      map#{widget.id}.setCenter(centerposition, 9);
+      markerlayer#{widget.id}.redraw();
+
+      //map.addControl(new OpenLayers.Control.LayerSwitcher());
+      }); // end function(response)
+    }; // end function(getMarkers())
+
+    getMarkers#{widget.id}();
+
+    setInterval("getMarkers#{widget.id}()", 30000);
+
+    // This is a handler for the user_focus event
+    function highlightUser#{widget.id}(ev) {
+      // We have just the user and his source_id. Need to get the reference to an existing marker
+      srcid = ev['user']['source_id'];
+      if (srcdata#{widget.id}.hasOwnProperty(srcid)) {
+        var marker = srcdata#{widget.id}[srcid];
+        position = new OpenLayers.LonLat(marker["longitude"], marker["latitude"]).transform(fromProjection#{widget.id}, toProjection#{widget.id});
+        m = new OpenLayers.Marker(position);
+
+        var size = new OpenLayers.Size(12, 12);
+        var offset = new OpenLayers.Pixel(-(size.w / 2), -size.h);
+        m.icon = new OpenLayers.Icon("/assets/hilite_user.png", size, offset);
+
+        markerlayer#{widget.id}.addMarker(m);      
+      };    
+    };
+    
+    registerEvHandler('user_focus', highlightUser#{widget.id});

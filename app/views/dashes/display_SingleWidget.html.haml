@@ -1,0 +1,9 @@
+%div
+  - wtype = WidgetType.find(@widgets[0].widget_type_id)
+  = render :partial => "widgets/#{wtype.name}", :locals => {:widget => @widgets[0]}
+  %div.row.pull-right
+    %p.graytext
+      %large
+        Widget: #{@widgets[0].name}, Id: #{@widgets[0].id}
+	
+

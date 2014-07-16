@@ -1,0 +1,31 @@
+// This widget shows a Search box and displays user names as search results
+// In this sense, it is not bound with any "source" as such.
+
+- divid = "UserSearch#{widget.id}"
+
+%h3 User search
+
+%div{:id => "#{divid}"}
+  %div
+    %input.input-medium.search-query#searchbox{:type => "text"}
+    %button.btn{:type => "submit", :onclick => "searchUsers#{widget.id}($('#searchbox').attr('value'));"} Search
+  %div#usersearch_results
+
+%script
+  :plain  
+    function searchUsers#{widget.id}(query) {
+      $.getJSON("/user_search?q=" + query, function(data) {
+        var ulist = data.ulist;
+        for (var i=0; i<ulist.length; i++) {
+          var u = ulist[i];
+          var udiv = document.createElement('div');
+          udiv.innerHTML = u["name"];
+          $("#usersearch_results").append(udiv);
+          
+          // Raise a user_focus event
+          var ev = {'type': 'user_focus', 'user': u};
+          raiseEv(ev);
+        };
+      }); //end function getJSON()
+    };
+

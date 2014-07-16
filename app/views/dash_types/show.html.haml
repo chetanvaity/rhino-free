@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @dash_type.name
+%p
+  %b Properties:
+  = @dash_type.properties
+
+= link_to 'Edit', edit_dash_type_path(@dash_type)
+\|
+= link_to 'Back', dash_types_path

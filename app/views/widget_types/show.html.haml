@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @widget_type.name
+%p
+  %b Properties:
+  = @widget_type.properties
+
+= link_to 'Edit', edit_widget_type_path(@widget_type)
+\|
+= link_to 'Back', widget_types_path

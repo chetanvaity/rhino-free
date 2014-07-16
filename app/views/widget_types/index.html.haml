@@ -1,0 +1,23 @@
+%h1 Listing widget_types
+
+%table
+  %tr
+    %th id
+    %th Name
+    %th Properties
+    %th
+    %th
+    %th
+
+  - @widget_types.each do |widget_type|
+    %tr
+      %td= widget_type.id
+      %td= widget_type.name
+      %td= widget_type.properties
+      %td= link_to 'Show', widget_type
+      %td= link_to 'Edit', edit_widget_type_path(widget_type)
+      %td= link_to 'Destroy', widget_type, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Widget type', new_widget_type_path

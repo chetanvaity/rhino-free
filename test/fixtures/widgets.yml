@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  widget_type_id: 1
+  sources: MyString
+
+two:
+  name: MyString
+  widget_type_id: 1
+  sources: MyString

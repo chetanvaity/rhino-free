@@ -1,0 +1,23 @@
+%h1 Listing dash_types
+
+%table
+  %tr
+    %th id
+    %th Name
+    %th Properties
+    %th
+    %th
+    %th
+
+  - @dash_types.each do |dash_type|
+    %tr
+      %td= dash_type.id
+      %td= dash_type.name
+      %td= dash_type.properties
+      %td= link_to 'Show', dash_type
+      %td= link_to 'Edit', edit_dash_type_path(dash_type)
+      %td= link_to 'Destroy', dash_type, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Dash type', new_dash_type_path

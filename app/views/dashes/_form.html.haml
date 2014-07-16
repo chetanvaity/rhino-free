@@ -1,0 +1,26 @@
+= form_for @dash do |f|
+  - if @dash.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@dash.errors.count, "error")} prohibited this dash from being saved:"
+      %ul
+        - @dash.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+
+  -#.field
+    = f.label :dash_type_id
+    = f.number_field :dash_type_id
+  -#Replace field id input with select list
+    Include "Blank field" to accomodate dash creation "before" dash_type creation
+  .field
+    = f.label :dash_type_id
+    #{select("dash", "dash_type_id", DashType::all.collect {|t| [t.name, t.id]}, {:include_blank => true})}
+
+  .field
+    = f.label :widgets
+    = f.text_field :widgets
+  .actions
+    = f.submit 'Save'

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type='text/javascript'>
+ //onclick="getLocation()">Try It</button>
+var count = 0;
+var llat, llong;
+
+//Not used
+//Get current location and transmit location to ThingSpeak
+function locate() {
+	count++;
+	x.innerHTML="";
+	getLocation();
+	setTimeout(txLocation, 10000); //set a delay for populating the geolocation values
+	//txLocation();
+}
+
+//Tx location to thingspeak
+function txLocation() {
+        var xmlhttp; 
+
+	//Hardcoding rhino app ip
+        var locurl = "http://50.116.23.141:3000/update?key=BFR0V9C7SQGZOWFM&lat=" + llat + "&long=" + llong; 
+
+        xmlhttp=new XMLHttpRequest(); 
+        xmlhttp.open("GET", locurl, true) 
+        xmlhttp.send(null); 
+} 
+
+//get lat/long values and transmit to thingspeak server
+function handlePosition(position) {
+  //increase count
+  count++;
+
+  //Get lat/long
+  llat = position.coords.latitude;
+  llong = position.coords.longitude;
+
+  // Print co-ordinates on screen
+  x.innerHTML=""; //Required?
+  x.innerHTML = count + "<br>Latitude: " + llat + "<br>Longitude: " + llong;	
+
+  //Since this is a callback function, 
+  //watchPosition returns always with a position object. 
+  //Send to thingspeak without checking for val
+  txLocation();
+}
+
+
+//Call watchPosition to regularly update location information
+function getLocation() {
+  if (navigator.geolocation) {
+    var options = 
+{timeout:10000, enableHighAccuracy: true, maximumAge:60000}
+    //navigator.geolocation.watchPosition(handlePosition,showError, options);
+
+    navigator.geolocation.getCurrentPosition( handlePosHiAccuracy,
+    showErrorHiAccuracy,{timeout:10000, enableHighAccuracy: true, maximumAge:60000});
+  }
+  else {
+	x.innerHTML="Geolocation is not supported by this browser.";
+  }
+}
+
+function handlePosHiAccuracy(position) {
+ handlePosition(position);
+}
+
+function showErrorHiAccuracy(error, position) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML="User denied the request for Geolocation."
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML="Location information is unavailable."
+      break;
+    case error.TIMEOUT:
+     {
+      navigator.geolocation.getCurrentPosition( handlePosLowAccuracy, 
+        showErrorLowAccuracy,
+        {maximumAge:600000, timeout:10000, enableHighAccuracy: false});
+      x.innerHTML="The request to get user location timed out."
+      break;
+     }
+    case error.UNKNOWN_ERROR:
+      x.innerHTML="An unknown error occurred."
+      break;
+   }
+}
+
+function handlePosLowAccuracy(position) {
+ handlePosition(position);
+}
+
+function showErrorLowAccuracy(error, position) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML="User denied the request for Geolocation."
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML="Location information is unavailable."
+      break;
+    case error.TIMEOUT:
+      x.innerHTML="The request to get user location timed out."
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML="An unknown error occurred."
+      break;
+   }
+}
+
+
+</script>
+
+</head>
+
+<body>
+<div id="locater">Test </div>
+<script>
+var x = document.getElementById("locater");
+//locate();
+//setInterval("locate()", 60000);
+getLocation();
+setInterval("getLocation()", 60000);
+
+</script>
+</body>
+</html>
+
+

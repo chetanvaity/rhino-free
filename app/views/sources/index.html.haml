@@ -1,0 +1,25 @@
+%h1 Listing sources
+
+%table
+  %tr
+    %th id
+    %th Name
+    %th Source type
+    %th Properties
+    %th
+    %th
+    %th
+
+  - @sources.each do |source|
+    %tr
+      %td= source.id
+      %td= source.name
+      %td= source.source_type_id
+      %td= source.properties
+      %td= link_to 'Show', source
+      %td= link_to 'Edit', edit_source_path(source)
+      %td= link_to 'Destroy', source, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Source', new_source_path
